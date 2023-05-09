@@ -1,4 +1,5 @@
-from pyclip import copy
+from subprocess import run
+from time import sleep
 
 
 def main():
@@ -10,10 +11,11 @@ def main():
         'https://www.urlvoid.com/scan/'
     ]
     domain = input('>>> ')
-    dom_urls = [f'{url}{domain}' for url in urls]
-    copy('\n'.join(dom_urls))
-
-    input('...')
+    for url in urls:
+        new_url = f'{url}{domain}'
+        print(new_url)
+        run(['powershell', f'start "{new_url}"'])
+        sleep(1)
 
 
 if __name__ == "__main__":
