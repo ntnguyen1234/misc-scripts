@@ -1,0 +1,31 @@
+{
+    "uBlock Origin": "",
+    "browser": "",
+    "filterset (summary)": {},
+    "listset (total-discarded, last-updated)": {
+        "removed": "",
+        "added": "",
+        "default": ""
+    },
+    "filterset (user)": "",
+    "switchRuleset": {
+        "added": ""
+    },
+    "hostRuleset": {
+        "added": ""
+    },
+    "urlRuleset": {
+        "added": ""
+    },
+    "modifiedUserSettings": "",
+    "modifiedHiddenSettings": "",
+    "supportStats": {
+        "allReadyAfter": "",
+        "maxAssetCacheWait": ""
+    },
+    "popupPanel": {
+        "blocked": "",
+        "network": "",
+        "cosmetic": ""
+    }
+}
