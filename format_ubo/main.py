@@ -9,7 +9,14 @@ def main():
     reformatter.summary('filterset (summary)')
     reformatter.listset('listset (total-discarded, last-updated)')
 
-    for ruleset in ['switchRuleset', 'hostRuleset', 'urlRuleset']:
+    rulesets = [
+        'filterset (user)',
+        'trustedset',
+        'switchRuleset', 
+        'hostRuleset', 
+        'urlRuleset'
+    ]
+    for ruleset in rulesets:
         if ruleset not in reformatter.troubleshoot:
             continue
         

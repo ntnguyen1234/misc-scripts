@@ -8,6 +8,9 @@
         "default": ""
     },
     "filterset (user)": "",
+    "trustedset": {
+        "added": ""
+    },
     "switchRuleset": {
         "added": ""
     },

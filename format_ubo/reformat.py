@@ -5,7 +5,7 @@ from ubo_utils import load_json
 
 
 class Reformatter:
-    __slots__ = ('troubleshoot', 'text')
+    __slots__ = ('text', 'troubleshoot')
 
     def __init__(self):
         self.troubleshoot = dict()
@@ -60,10 +60,17 @@ class Reformatter:
         self.troubleshoot[key] = ls_dict
 
     def ruleset(self, key: str):
-        value = self.extract_value(key, rf'{key}:.+?(?=modifiedUserSettings|(?:[a-zA-Z]+: ){{2}})')
+        if 'filterset' in key:
+            value = self.extract_value(key, r'filterset \(user\):.+?(?=modifiedUserSettings|(?:[a-zA-Z]+: ){2})')
+        else:
+            value = self.extract_value(key, rf'{key}:.+?(?=modifiedUserSettings|(?:[a-zA-Z]+: ){{2}})')
         
-        for k, extract in re.findall(r'(\w+): (\[.*)', value):
-            self.troubleshoot[key][k] = extract
+        if ':' not in value:
+            self.troubleshoot[key] = value
+        else:
+            self.troubleshoot[key] = dict()
+            for k, extract in re.findall(r'(\w+): (\[.*)', value):
+                self.troubleshoot[key][k] = extract
 
     def user_hidden(self, key: str):
         if 'user' in key.lower():
