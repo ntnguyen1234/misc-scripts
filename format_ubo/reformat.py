@@ -59,29 +59,16 @@ class Reformatter:
 
         self.troubleshoot[key] = ls_dict
 
-    def ruleset(self, key: str):
-        if 'filterset' in key:
-            value = self.extract_value(key, r'filterset \(user\):.+?(?=modifiedUserSettings|(?:[a-zA-Z]+: ){2})')
+    def others(self, key: str):
+        if '(user)' in key:
+            value = self.extract_value(key, r'filterset \(user\):.+?(?=(?:[a-zA-Z]+: ){2})')
         else:
-            value = self.extract_value(key, rf'{key}:.+?(?=modifiedUserSettings|(?:[a-zA-Z]+: ){{2}})')
+            value = self.extract_value(key, rf'{key}:.+?(?=(?:[a-zA-Z]+: ){{2}})')
         
         if ':' not in value:
             self.troubleshoot[key] = value
         else:
             self.troubleshoot[key] = dict()
-            for k, extract in re.findall(r'(\w+): (\[.*)', value):
-                self.troubleshoot[key][k] = extract
-
-    def user_hidden(self, key: str):
-        if 'user' in key.lower():
-            value = self.extract_value(key, rf'{key}:.+?(?=modifiedHiddenSettings)')
-        else:
-            value = self.extract_value(key, rf'{key}:.+?(?=supportStats)')
-        
-        if ':' not in value:
-            self.troubleshoot[key] = value
-        else:
-            self.troubleshoot[key] = dict()
-            for k, extract in re.findall(r'(\w+): ([\[\]\w]+)', value):
+            for k, extract in re.findall(r'(\w+): (.+?(?=(?: \w+:|$)))', value):
                 extract: str
                 self.troubleshoot[key][k] = int(extract) if extract.isnumeric() else extract

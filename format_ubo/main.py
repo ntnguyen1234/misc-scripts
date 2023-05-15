@@ -6,24 +6,22 @@ from ubo_utils import load_text
 def main():
     reformatter = Reformatter()
     reformatter.load_template(load_text('test.txt'))
-    reformatter.summary('filterset (summary)')
-    reformatter.listset('listset (total-discarded, last-updated)')
+    
+    for key in reformatter.troubleshoot:
+        key: str
 
-    rulesets = [
-        'filterset (user)',
-        'trustedset',
-        'switchRuleset', 
-        'hostRuleset', 
-        'urlRuleset'
-    ]
-    for ruleset in rulesets:
-        if ruleset not in reformatter.troubleshoot:
+        if key.startswith(('Chromium', 'Firefox', 'uBlock Origin')):
             continue
-        
-        reformatter.ruleset(ruleset)
 
-    for key in ['modifiedUserSettings', 'modifiedHiddenSettings']:
-        reformatter.user_hidden(key)
+        match key:
+            case 'filterset (summary)':
+                reformatter.summary(key)
+            case 'listset (total-discarded, last-updated)':
+                reformatter.listset(key)
+            case 'popupPanel':
+                continue
+            case _:
+                reformatter.others(key)
     
     ic(reformatter.troubleshoot)
 
