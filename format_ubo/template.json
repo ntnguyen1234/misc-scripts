@@ -3,7 +3,7 @@
     "browser": "",
     "filterset (summary)": {},
     "listset (total-discarded, last-updated)": {},
-    "filterset (user)": "",
+    "filterset (user)": {},
     "trustedset": {
         "added": ""
     },
@@ -16,8 +16,8 @@
     "urlRuleset": {
         "added": ""
     },
-    "modifiedUserSettings": "",
-    "modifiedHiddenSettings": "",
+    "modifiedUserSettings": {},
+    "modifiedHiddenSettings": {},
     "supportStats": {
         "allReadyAfter": "",
         "maxAssetCacheWait": ""

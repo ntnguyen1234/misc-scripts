@@ -4,6 +4,10 @@ from icecream import ic
 from ubo_utils import load_json
 
 
+def get_search(pattern: str, text: str) -> dict[str, str]:
+    return {k: v for k, v in re.findall(pattern, text)}
+
+
 class Reformatter:
     __slots__ = ('text', 'troubleshoot')
 
@@ -22,7 +26,7 @@ class Reformatter:
             self.troubleshoot[extract.group(1)] = extract.group(2)
 
         for key in (template := load_json('template.json')):
-            if key in ['uBlock Origin', 'browser']:
+            if key in {'uBlock Origin', 'browser'}:
                 continue
 
             if f'{key}: ' not in self.text:
@@ -31,16 +35,12 @@ class Reformatter:
             self.troubleshoot[key] = template[key]
 
     def extract_value(self, key: str, pattern: str, text: str = None) -> str:
-        text = text or self.text
-
-        extract = re.search(pattern, text)[0].strip()
+        extract = re.search(pattern, text or self.text)[0].strip()
         return extract.split(f'{key}:')[-1].strip()
 
     def summary(self, key: str):
         value = self.extract_value(key, r'filterset.+?(?=listset)')
-
-        for filter_type, num in re.findall(r'(\w+): (\d+)', value):
-            self.troubleshoot[key][filter_type] = int(num)
+        self.troubleshoot[key] = get_search(r'(\w+): (\d+)', value)
 
     def listset(self, key: str):
         value = self.extract_value(key, r'listset.+?(?=filterset)')
@@ -48,10 +48,8 @@ class Reformatter:
             if f'{k}: ' not in value:
                 continue
             
-            self.troubleshoot[key][k] = dict()
             extract = self.extract_value(k, rf'{k}: (.+?(?=(?:(?:\S+: ){{2}})|$))', value)
-            for link, stats in re.findall(r'(\S+): (\d+\-\d+, [.\w]+)', extract.strip()):
-                self.troubleshoot[key][k][link] = stats
+            self.troubleshoot[key][k] = get_search(r'(\S+): (\d+\-\d+, [.\w]+)', extract.strip())
 
     def others(self, key: str):
         if 'popup' in key:
@@ -63,16 +61,14 @@ class Reformatter:
         
         if ':' not in value:
             self.troubleshoot[key] = value
-        else:
-            self.troubleshoot[key] = dict()
-            for k, extract in re.findall(r'(\w+): (.+?(?=(?: \w+:|$)))', value):
-                extract: str
-                match k:
-                    case 'cosmetic':
-                        self.troubleshoot[key][k] = [f'##{item}'.replace('####', '##') for item in extract.split(' ##')]
-                    case 'network':
-                        self.troubleshoot[key][k] = dict()
-                        for domain, num in re.findall(r'([.\w]+): (.+?(?=(?: [.\w]+:|$)))', extract):
-                            self.troubleshoot[key][k][domain] = int(num)
-                    case _:
-                        self.troubleshoot[key][k] = int(extract) if extract.isnumeric() else extract
+            return
+        
+        for k, extract in re.findall(r'(\w+): (.+?(?=(?: \w+:|$)))', value):
+            extract: str
+            match k:
+                case 'cosmetic':
+                    self.troubleshoot[key][k] = [f'##{item}'.replace('####', '##') for item in extract.split(' ##')]
+                case 'network':
+                    self.troubleshoot[key][k] = get_search(r'([.\w]+): (.+?(?=(?: [.\w]+:|$)))', extract)
+                case _:
+                    self.troubleshoot[key][k] = int(extract) if extract.isnumeric() else extract
