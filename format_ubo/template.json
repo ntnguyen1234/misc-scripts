@@ -2,11 +2,7 @@
     "uBlock Origin": "",
     "browser": "",
     "filterset (summary)": {},
-    "listset (total-discarded, last-updated)": {
-        "removed": "",
-        "added": "",
-        "default": ""
-    },
+    "listset (total-discarded, last-updated)": {},
     "filterset (user)": "",
     "trustedset": {
         "added": ""

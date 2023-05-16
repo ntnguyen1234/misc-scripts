@@ -38,3 +38,17 @@ def load_text(
         return clean_split(fr_read, '\n')
     else:
         return fr_read
+    
+
+def write_json(data, file_path: str | PosixPath | WindowsPath):
+    with open(file_path, 'w', encoding='utf-8', errors='surrogateescape') as fw:
+        json.dump(data, fw, indent=4, ensure_ascii=False)
+
+
+def write_text(data, file_path: str | PosixPath | WindowsPath):
+    with open(file_path, 'w', encoding='utf-8', errors='surrogateescape') as fw:
+        if isinstance(data, str):
+            fw.write(data.strip())
+        else:
+            for item in data:
+                fw.write(f'{item}\n')

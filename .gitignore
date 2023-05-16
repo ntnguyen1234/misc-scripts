@@ -130,3 +130,5 @@ dmypy.json
 
 /format_ubo/test.txt
 /format_ubo/reformat2.py
+/format_ubo/temp.json
+/format_ubo/temp.yaml
