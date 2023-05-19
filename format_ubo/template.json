@@ -22,9 +22,5 @@
         "allReadyAfter": "",
         "maxAssetCacheWait": ""
     },
-    "popupPanel": {
-        "blocked": "",
-        "network": "",
-        "cosmetic": ""
-    }
+    "popupPanel": {}
 }
