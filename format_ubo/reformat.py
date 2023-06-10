@@ -55,9 +55,9 @@ class Reformatter:
         if 'popup' in key:
             value = self.extract_value(key, r'popupPanel.*')
         elif '(user)' in key:
-            value = self.extract_value(key, r'filterset \(user\):.+?(?=(?:[a-zA-Z]+: ){2})')
+            value = self.extract_value(key, r'filterset \(user\):.+?(?=(?:[A-z]+: ){2})')
         else:
-            value = self.extract_value(key, rf'{key}:.+?(?=(?:[a-zA-Z]+: ){{2}})')
+            value = self.extract_value(key, rf'{key}:.+?(?=(?:[A-z]+: ){{2}})')
         
         if ':' not in value:
             self.troubleshoot[key] = value
