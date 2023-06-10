@@ -7,7 +7,7 @@ from yaml import dump
 def main():
     reformatter = Reformatter()
     # reformatter.load_template(load_text('test.txt'))
-    text = input('>>> ')
+    text = input('>>> ').replace('\\"', '"')
     reformatter.load_template(text)
     
     for key in reformatter.troubleshoot:

@@ -69,6 +69,7 @@ class Reformatter:
                 case 'cosmetic':
                     self.troubleshoot[key][k] = [f'##{item}'.replace('####', '##') for item in extract.split(' ##')]
                 case 'network':
-                    self.troubleshoot[key][k] = get_search(r'([.\w]+): (.+?(?=(?: [.\w]+:|$)))', extract)
+                    print(extract)
+                    self.troubleshoot[key][k] = get_search(r'([-.\w]+): (.+?(?=(?: [-.\w]+:|$)))', extract)
                 case _:
                     self.troubleshoot[key][k] = int(extract) if extract.isnumeric() else extract
