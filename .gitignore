@@ -132,3 +132,6 @@ dmypy.json
 /format_ubo/reformat2.py
 /format_ubo/temp.json
 /format_ubo/temp.yaml
+
+/reddit-noti/config.json
+/reddit-noti/example.json
