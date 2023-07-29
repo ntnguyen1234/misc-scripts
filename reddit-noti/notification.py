@@ -16,6 +16,7 @@ class Notification:
             ic(response.content)
 
     def get_noti(self):
+        ids = set()
         with Client() as client:
             while True:
                 response = client.get(self.config['reddit_inbox'])
@@ -29,9 +30,13 @@ class Notification:
 
                     if not data['new']:
                         continue
+                    
+                    if data['id'] in ids:
+                        continue
 
                     noti_message = f'{data["subreddit_name_prefixed"]} - {data["author"]}\n{data["link_title"]}\n---\n{data["body"]}\n---\nhttps://old.reddit.com{data["context"]}'
 
                     self.notify(noti_message)
+                    ids.add(data['id'])
                 
                 sleep(30)
