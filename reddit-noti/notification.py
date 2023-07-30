@@ -1,6 +1,8 @@
 from time import sleep
-from httpx import Client
+
+import httpx
 from icecream import ic
+
 from utils_reddit import load_json, write_json
 
 
@@ -11,20 +13,24 @@ class Notification:
     def notify(self, message: str):
         # message = 'Test'
         
-        with Client() as client:
+        with httpx.Client() as client:
             response = client.post(self.config['notify_url'], data=message.encode(encoding='utf-8'))
-            ic(response.content)
+            ic(response.json())
 
     def get_noti(self):
         ids = set()
-        with Client() as client:
+        with httpx.Client() as client:
             while True:
-                response = client.get(self.config['reddit_inbox'])
-                messages = response.json()
+                try:
+                    response = client.get(self.config['reddit_inbox'])
+                except httpx.ConnectError:
+                    sleep(10)
+                    continue
                 
                 # write_json(response.json(), 'example.json')
                 # messages = load_json('example.json')
 
+                messages = response.json()
                 for message in messages['data']['children']:
                     data = message['data']
 
@@ -34,7 +40,7 @@ class Notification:
                     if data['id'] in ids:
                         continue
 
-                    noti_message = f'{data["subreddit_name_prefixed"]} - {data["author"]}\n{data["link_title"]}\n---\n{data["body"]}\n---\nhttps://old.reddit.com{data["context"]}'
+                    noti_message = f'{data["subreddit_name_prefixed"]} - u/{data["author"]}\n{data["link_title"]}\n---\n{data["body"]}\n---\nhttps://old.reddit.com{data["context"]}'
 
                     self.notify(noti_message)
                     ids.add(data['id'])
