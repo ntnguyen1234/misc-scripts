@@ -23,7 +23,11 @@ class Notification:
             while True:
                 try:
                     response = client.get(self.config['reddit_inbox'])
-                except httpx.ConnectError:
+                except (
+                    httpx.ConnectError, 
+                    httpx.ConnectTimeout,
+                    httpx.ReadTimeout
+                ):
                     sleep(10)
                     continue
                 
@@ -40,7 +44,7 @@ class Notification:
                     if data['id'] in ids:
                         continue
 
-                    noti_message = f'{data["subreddit_name_prefixed"]} - u/{data["author"]}\n{data["link_title"]}\n---\n{data["body"]}\n---\nhttps://old.reddit.com{data["context"]}'
+                    noti_message = f'{data["subreddit_name_prefixed"]} - u/{data["author"]}\n{data["body"]}\n---\n{data["link_title"]}\nhttps://old.reddit.com{data["context"]}'
 
                     self.notify(noti_message)
                     ids.add(data['id'])
