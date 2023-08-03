@@ -1,3 +1,4 @@
+import json
 from time import sleep
 
 import httpx
@@ -34,7 +35,13 @@ class Notification:
                 # write_json(response.json(), 'example.json')
                 # messages = load_json('example.json')
 
-                messages = response.json()
+                try:
+                    messages = response.json()
+                except json.decoder.JSONDecodeError:
+                    print(response.content)
+                    sleep(10)
+                    continue
+                
                 for message in messages['data']['children']:
                     data = message['data']
 
