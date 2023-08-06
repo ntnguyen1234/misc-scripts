@@ -133,5 +133,9 @@ dmypy.json
 /format_ubo/temp.json
 /format_ubo/temp.yaml
 
+/pastefy/tokens.txt
+/pastefy/yt.html
+/pastefy/config.json
+
 /reddit-noti/config.json
 /reddit-noti/example.json

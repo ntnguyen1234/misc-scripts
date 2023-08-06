@@ -1,7 +1,4 @@
-from icecream import ic
-
 from notification import Notification
-
 from utils_reddit import load_json
 
 
