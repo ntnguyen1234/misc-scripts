@@ -1,22 +1,27 @@
 import json
+import subprocess
 from time import sleep
 
 import httpx
 from icecream import ic
 from plyer import notification as noti
-
 from utils_reddit import load_json, write_json
 
 
 class Notification:
     def __init__(self, config: dict[str, str]):
         self.config = config
+        self.simplex_contact = self.config['simplex_contact']
 
-    def notify(self, message: str):
+    def notify(self, message: str, headers: dict[str, str] = {}):
         # message = 'Test'
         
         with httpx.Client() as client:
-            response = client.post(self.config['notify_url'], data=message.encode(encoding='utf-8'))
+            response = client.post(
+                self.config['notify_url'], 
+                data=message.encode(encoding='utf-8'),
+                headers=headers
+            )
             ic(response.json())
 
     def get_noti(self):
@@ -59,16 +64,38 @@ class Notification:
                         continue
 
                     title = f'{data["subreddit_name_prefixed"]} - u/{data["author"]}'
-                    message_body = data['body']
+                    message_body: str = data['body']
                     
-                    noti_message = f'{title}\n{message_body}\n---\n{data["link_title"]}\nhttps://old.reddit.com{data["context"]}'
-
+                    # md_message = f'{title}\n{message_body}\n---\n[{data["link_title"]}](https://old.reddit.com{data["context"]})'
+                    
                     noti.notify(
                         title=title,
-                        message=message_body,
+                        message=message_body[:256],
                         timeout=20
                     )
-                    self.notify(noti_message)
+
+                    ntfy_resp = client.post(
+                        url=self.config['notify_url'], 
+                        data=f'{title}\n{message_body}\n---\n{data["link_title"]}\nhttps://old.reddit.com{data["context"]}'.encode(encoding='utf-8'),
+                        headers={ 'Title': 'Reddit' }
+                    )
+                    ic(ntfy_resp.json())
+                    # self.notify(
+                    #     message=md_message,
+                    #     headers={
+                    #         'Title': 'Reddit',
+                    #         'Markdown': 'yes'
+                    #     }
+                    # )
+                    # completed = subprocess.run(
+                    #     [
+                    #         'powershell', 
+                    #         'simplex-beta', 
+                    #         f'-e "@{self.simplex_contact} {noti_message}"',
+                    #     ], 
+                    #     capture_output=True
+                    # )
+                    # print(completed.stdout.decode())
                     ids.add(data['id'])
                 
                 sleep(30)

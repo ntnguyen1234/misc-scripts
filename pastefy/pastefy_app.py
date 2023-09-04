@@ -1,3 +1,5 @@
+import subprocess
+from pathlib import Path
 from time import sleep
 
 import httpx
@@ -6,7 +8,7 @@ from icecream import ic
 from notification import Notification
 from plyer import notification as noti
 
-from utils import load_json, load_text
+from utils import load_json, load_text, uniques, write_text
 
 
 class Pastefy:
@@ -16,7 +18,9 @@ class Pastefy:
         self.headers = {
             'Authorization': f'Bearer {self.token}'
         }
-        self.notifier = Notification(load_json('config.json'))
+        self.configs = load_json('config.json')
+        self.notifier = Notification(self.configs)
+        self.simplex_contact = self.configs['simplex_contact']
     
     def edit(self, idx: str, text: str):
         data = {
@@ -31,7 +35,6 @@ class Pastefy:
                 data=data
             )
             ic(response.json())
-
 
     @staticmethod
     def youtube_polymer():
@@ -59,35 +62,47 @@ class Pastefy:
                 print(response.content)
 
             yt_html = BeautifulSoup(response.content, 'lxml')
-        #     Path('yt.html').write_bytes(response.content)
+            Path('yt.html').write_bytes(response.content)
         # yt_html = BeautifulSoup(str(load_text('yt.html')), 'lxml')
+        
+        hrefs = []
+        for item in yt_html.select('[href*="_polymer_"], [src*="_polymer_"]'):
+            # ic(item)
+            if 'href' in item.attrs:
+                hrefs.append(item['href'])
+            else:
+                hrefs.append(item['src'])
 
-        return yt_html.select_one('link[as="script"][href*="polymer_"]')['href']
+        return uniques(hrefs)
+        # return yt_html.select_one('link[as="script"][href*="polymer_"]')['href']
     
 
     def add_polymer(self, idx: str):
         while True:
             url = f'https://pastefy.app/{idx}/raw'
+            hrefs = list(load_text('polymer.txt', True))
 
             try:
-                with httpx.Client() as client:
-                    hrefs = client.get(url).text.strip().split()
+                # with httpx.Client() as client:
+                #     hrefs = client.get(url).text.strip().split()
 
-                if not (href := self.youtube_polymer()):
+                if not (polymer_urls := self.youtube_polymer()):
                     noti.notify(
                         title='Youtube polymer',
                         message='No HREF!',
                         timeout=30
                     )
-                    self.notifier.notify('Youtube polymer\n---\nNo HREF!')
+                    print('No HREF!')
+                    # self.notifier.notify('Youtube polymer\n---\nNo HREF!')
                     sleep(60)
                     continue
-
-                if href in hrefs:
+                
+                new_urls = [polymer_url for polymer_url in polymer_urls if polymer_url not in hrefs]
+                if not new_urls:
                     sleep(300)
                     continue
 
-                hrefs.append(href)
+                hrefs.extend(new_urls)
                 self.edit(idx, '\n'.join(hrefs))
             except (
                 httpx.ConnectError, 
@@ -95,13 +110,26 @@ class Pastefy:
                 httpx.ReadTimeout,
                 httpx.RemoteProtocolError
             ):
+                print('Error!')
                 sleep(60)
                 continue
 
+            write_text(hrefs, 'polymer.txt')
+
             noti.notify(
                 title='Youtube polymer',
-                message=href,
+                message=(message := '\n'.join(new_urls)),
                 timeout=30
             )
-            self.notifier.notify(f'Youtube polymer\n---\n{href}')
+            self.notifier.notify(message)
+            # completed = subprocess.run(
+            #     [
+            #         'powershell', 
+            #         'simplex-beta', 
+            #         f'-e "@{self.simplex_contact} Youtube polymer\n---\n{message}"',
+            #     ], 
+            #     capture_output=True
+            # )
+            # print(completed.stdout.decode())
+            # ic(message)
             sleep(300)

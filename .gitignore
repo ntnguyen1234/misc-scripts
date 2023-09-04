@@ -128,12 +128,21 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+github-noti
+multiprocessing_test
+
 /format_ubo/test.txt
 /format_ubo/reformat2.py
 /format_ubo/temp.json
 /format_ubo/temp.yaml
 
+/noti-all/config.json
+/noti-all/github.html
+/noti-all/yt.html
+
+/pastefy/polymer.txt
 /pastefy/tokens.txt
+/pastefy/github.html
 /pastefy/yt.html
 /pastefy/config.json
 
