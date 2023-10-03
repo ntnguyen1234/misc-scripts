@@ -1,3 +1,4 @@
+#!/Users/Administrator/venv/misc/Scripts/python
 from multiprocessing import Process
 
 from notifications import Notifications
