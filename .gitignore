@@ -139,6 +139,7 @@ multiprocessing_test
 /noti-all/config.json
 /noti-all/github.html
 /noti-all/yt.html
+/noti-all/youtube-fix.txt
 
 /pastefy/polymer.txt
 /pastefy/tokens.txt
@@ -148,3 +149,9 @@ multiprocessing_test
 
 /reddit-noti/config.json
 /reddit-noti/example.json
+
+/video2gif/*.gif
+/video2gif/*.mkv
+/video2gif/*.mp4
+/video2gif/*.webm
+/video2gif/*.html

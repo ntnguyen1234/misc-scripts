@@ -1,4 +1,4 @@
-#!/Users/Administrator/venv/misc/Scripts/python
+#!/Users/Administrator/venv/misc12/Scripts/python
 from multiprocessing import Process
 
 from notifications import Notifications
@@ -7,9 +7,10 @@ from notifications import Notifications
 def main():
     noti_app = Notifications()
     functions = [
+        # noti_app.test
         noti_app.reddit_notify,
         noti_app.github_notify,
-        noti_app.add_polymer
+        noti_app.add_polymer,
     ]
 
     processes: list[Process] = []
