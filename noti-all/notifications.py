@@ -1,4 +1,5 @@
 import json
+import ssl
 from datetime import datetime, timezone
 from pathlib import Path
 from time import sleep
@@ -24,7 +25,7 @@ class Notifications:
             'Sec-Fetch-Mode': 'navigate',
             'Sec-Fetch-Site': 'cross-site',
             'Upgrade-Insecure-Requests': '1',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/116.0',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0',
         }
         # Pastefy
         self.pastefy_url = 'https://pastefy.app/api/v2/paste'
@@ -33,7 +34,7 @@ class Notifications:
         }
 
     def test(self):
-        with httpx.Client() as client:
+        with httpx.Client(verify=ssl.create_default_context()) as client:
             self.ntfy(
                 client=client,
                 message='Test',
@@ -119,25 +120,15 @@ class Notifications:
 
     def reddit_notify(self):
         ids = set()
-        with httpx.Client() as client:
-            while True:
+        while True:
+            with httpx.Client(verify=ssl.create_default_context()) as client:
                 self.reddit_inbox(
                     client,
                     inbox_url=self.configs['reddit_inbox'],
                     ids=ids,
                     notify_title='Reddit inbox',
                 )
-
-                # sleep(5)
-
-                # self.reddit_inbox(
-                #     client,
-                #     inbox_url=self.configs['reddit_mod'],
-                #     ids=ids,
-                #     notify_title='Reddit moderator'
-                # )
-
-                sleep(30)
+            sleep(120)
 
     def github_notify(self):
         ids = set()
@@ -150,6 +141,7 @@ class Notifications:
                 http2=True,
                 follow_redirects=True,
                 timeout=httpx.Timeout(30),
+                verify=ssl.create_default_context()
             ) as client:
                 try:
                     response = client.get(url)
@@ -160,7 +152,7 @@ class Notifications:
                     httpx.RemoteProtocolError,
                 ):
                     print('Github Error!')
-                    sleep(30)
+                    sleep(60)
                     continue
 
                 Path('github.html').write_bytes(content := response.content)
@@ -187,7 +179,7 @@ class Notifications:
                 sleep(60)
                 continue
 
-            with httpx.Client() as client:
+            with httpx.Client(verify=ssl.create_default_context()) as client:
                 for message in messages:
                     text = f'{message["title"]}\n---\n{message["link"]}'
 
@@ -195,7 +187,7 @@ class Notifications:
 
                     self.ntfy(client=client, message=text, headers={'Title': 'Github'})
 
-            sleep(60)
+            sleep(120)
 
     def pastefy_edit(self, idx: str, text: str):
         data = {
@@ -204,17 +196,20 @@ class Notifications:
             'content': text,
         }
 
-        with httpx.Client(headers=self.pastefy_headers) as client:
+        with httpx.Client(
+            headers=self.pastefy_headers,
+            verify=ssl.create_default_context()
+        ) as client:
             response = client.put(url=f'{self.pastefy_url}/{idx}', data=data)
             ic(response.json())
 
     @staticmethod
     def youtube_polymer():
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
             'Accept-Language': 'en-US,en;q=0.5',
-            'Connection': 'keep-alive',
+            # 'Connection': 'keep-alive',
             'Upgrade-Insecure-Requests': '1',
             'Sec-Fetch-Dest': 'document',
             'Sec-Fetch-Mode': 'navigate',
@@ -228,6 +223,7 @@ class Notifications:
             http2=True,
             timeout=httpx.Timeout(30),
             follow_redirects=True,
+            verify=ssl.create_default_context()
         ) as client:
             response = client.get('https://www.youtube.com')
             if response.status_code >= 300:
@@ -254,7 +250,7 @@ class Notifications:
 
             try:
                 if (href := self.youtube_polymer()) in hrefs:
-                    sleep(300)
+                    sleep(600)
                     continue
 
                 utc_time = datetime.now(timezone.utc).isoformat(sep=' ', timespec='minutes')
@@ -280,7 +276,7 @@ class Notifications:
                 message=href,
                 timeout=30,
             )
-            with httpx.Client() as client:
+            with httpx.Client(verify=ssl.create_default_context()) as client:
                 self.ntfy(client=client, message=href, url=self.configs['polymer_url'])
 
-            sleep(300)
+            sleep(600)
