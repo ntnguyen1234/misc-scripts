@@ -152,6 +152,9 @@ multiprocessing_test
 /reddit-noti/config.json
 /reddit-noti/example.json
 
+/tunnels/config.json
+/tunnels/*.txt
+
 /video2gif/*.gif
 /video2gif/*.mkv
 /video2gif/*.mp4
