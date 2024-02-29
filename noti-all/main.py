@@ -1,4 +1,4 @@
-#!/Users/Administrator/venv/misc12/Scripts/python
+#!/Users/Administrator/venv/misc/Scripts/python
 # from multiprocessing import Process
 from threading import Thread
 

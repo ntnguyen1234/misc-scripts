@@ -1,0 +1,19 @@
+{
+    "keyID": "",
+    "keyName": "",
+    "applicationKey": "",
+    "bucketName": "",
+    "subDomain": "",
+    "imgTypes": [
+        "gif",
+        "jpeg",
+        "jpg",
+        "png"
+    ],
+    "txtTypes": [
+        "js",
+        "json",
+        "md",
+        "txt"
+    ]
+}

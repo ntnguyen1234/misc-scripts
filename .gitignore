@@ -131,6 +131,8 @@ dmypy.json
 github-noti
 multiprocessing_test
 
+/b2-upload/b2.json
+
 /format_ubo/test.txt
 /format_ubo/reformat2.py
 /format_ubo/temp.json
