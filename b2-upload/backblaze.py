@@ -66,11 +66,11 @@ class B2:
         return file_name
     
     def upload_from_clipboard(self, upload_type: str):
-        print('File name:')
-        f_name = input('>>> ')
         characters = string.ascii_letters + string.digits
         b2_file_name = ''.join([random.choice(characters) for _ in range(8)])
-        if f_name:
+
+        print('File name:')
+        if (f_name := input('>>> ')):
             b2_file_name = f'{f_name}-{b2_file_name}'
 
         match upload_type:
