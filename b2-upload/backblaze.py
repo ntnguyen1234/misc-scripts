@@ -31,7 +31,7 @@ class B2:
 
             self.bucket.upload_local_file(
                 local_file=img[0],
-                file_name=(file_name := b2_file_name+suffix),
+                file_name=(file_name := f'img/{b2_file_name+suffix}'),
             )
         else:
             if (img_format := img.format).lower() not in self.b2_keys['imgTypes']:
@@ -41,15 +41,16 @@ class B2:
             img.save(img_bytes, format=img_format)
             img_bytes = img_bytes.getvalue()
 
-            self.bucket.upload_bytes(
+            response = self.bucket.upload_bytes(
                 data_bytes=img_bytes,
-                file_name=(file_name := f'{b2_file_name}.{img_format.lower()}')
+                file_name=(file_name := f'img/{b2_file_name}.{img_format.lower()}')
             )
+            print(response)
 
         return file_name
     
     def upload_text(self, b2_file_name: str, upload_type: str, local_file: str=None) -> str:
-        file_name = f'{b2_file_name}.{upload_type.lower()}'
+        file_name = f'{upload_type}/{b2_file_name}.{upload_type.lower()}'
         
         if local_file:
             self.bucket.upload_local_file(
@@ -65,8 +66,12 @@ class B2:
         return file_name
     
     def upload_from_clipboard(self, upload_type: str):
+        print('File name:')
+        f_name = input('>>> ')
         characters = string.ascii_letters + string.digits
         b2_file_name = ''.join([random.choice(characters) for _ in range(8)])
+        if f_name:
+            b2_file_name = f'{f_name}-{b2_file_name}'
 
         match upload_type:
             case 'img':
