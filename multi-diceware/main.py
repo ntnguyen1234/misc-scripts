@@ -69,9 +69,10 @@ Choose your lists
         ''.join(str(randbelow(6) + 1) for _ in range(dice_length)) 
         for _ in range(password_length)
     ]
-    num_position = randbelow(password_length) + 1
     num_value = randbelow(num_max)
+    num_position = randbelow(password_length) + 1
     title_position = randbelow(password_length) + 1
+    special_position = randbelow(password_length) + 1
 
     if src_names:
         print()
@@ -93,7 +94,8 @@ Choose your lists
 
     print(f'\n{num_position = }')
     print(f'{num_value = }')
-    print(f'{title_position = }\n')
+    print(f'{title_position = }')
+    print(f'{special_position = }\n')
 
 
 if __name__ == "__main__":
