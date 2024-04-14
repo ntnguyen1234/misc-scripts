@@ -2,9 +2,8 @@ import json
 import urllib.request
 from urllib.parse import quote
 
-from flask import Flask, redirect, render_template, request
+from flask import redirect, render_template, request
 
-app = Flask(__name__)
 
 def request_url(url: str):
     req = urllib.request.Request(url, method='GET')
@@ -20,8 +19,7 @@ def get_url(claim_data: dict, ids: str):
     
     return claim_ids[0]['mainsnak']['datavalue']['value']
  
-@app.route('/wiki')
-def hello_world():
+def wiki_search():
     query = quote(request.args.get('q', default='', type=str))
     
     if not query:
@@ -44,7 +42,3 @@ def hello_world():
         return redirect(url)
 
     return redirect(f'https://www.startpage.com/sp/search?query={query}')
-    
- 
-if __name__ == "__main__":
-    app.run(port=8200)
