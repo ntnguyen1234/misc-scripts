@@ -81,10 +81,12 @@ Choose your lists
 
     print('\n')
 
+    combined: list[list[str]] = [[] for _ in range(max(1, len(src_names)))]
     for dice in dices:
         dice_dict: dict = worddict[dice]
 
-        for word in dice_dict.values():
+        for i, word in enumerate(dice_dict.values()):
+            combined[i].append(word)
             end_line = ''
             if len(dice_dict) > 1:
                 end_line = ' '*(16 - len(word))
@@ -97,6 +99,10 @@ Choose your lists
     print(f'{title_position = }')
     print(f'{special_position = }\n')
 
+    for word_list in combined:
+        word_list[title_position - 1] = word_list[title_position - 1].title()
+        word_list[num_position - 1] += str(num_value)
+        print('.'.join(word_list), end='\n\n')
 
 if __name__ == "__main__":
     main()
