@@ -154,6 +154,8 @@ multiprocessing_test
 
 /psitransfer-rename/config.json
 
+/pyscript/*
+
 /random-tool
 
 /reddit-noti/config.json

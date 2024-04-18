@@ -20,20 +20,28 @@ def get_url(claim_data: dict, ids: str):
     return claim_ids[0]['mainsnak']['datavalue']['value']
  
 def wiki_search():
-    query = quote(request.args.get('q', default='', type=str))
+    query = initial_query = request.args.get('q', default='', type=str)
     
-    if not query:
+    if not initial_query:
         return render_template('index.html')
+    
+    lang = 'en'
+    if '.' in initial_query:
+        lang = (query_split := initial_query.split('.'))[-1]
+        query = '.'.join(query_split[:-1])
 
-    result_query = request_url(f'https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&language=en&limit=1&search={query}')
+    result_query = request_url(f'https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&language={lang}&limit=1&search={quote(query)}')
+    
+    # with open('data.json', 'w', encoding='utf-8') as fw:
+    #     json.dump(result_query, fw, ensure_ascii=False, indent=2)
+
+    if not result_query['search']:
+        return redirect(f'https://www.startpage.com/sp/search?query={query}&cat=web&pl=opensearch&language=english')
+
     item_id = result_query['search'][0]['id']
-    print(item_id)
 
     result_id = request_url(f'https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&ids={item_id}&props=claims')
     claim_data = result_id['entities'][item_id]['claims']
-
-    # with open('data.json', 'w', encoding='utf-8') as fw:
-    #     json.dump(claim_data, fw, ensure_ascii=False, indent=2)
 
     for ids in ['P856', 'P1324']:
         if not (url := get_url(claim_data, ids)):
@@ -41,4 +49,4 @@ def wiki_search():
 
         return redirect(url)
 
-    return redirect(f'https://www.startpage.com/sp/search?query={query}')
+    return redirect(f'https://www.startpage.com/sp/search?query={query}&cat=web&pl=opensearch&language=english')
