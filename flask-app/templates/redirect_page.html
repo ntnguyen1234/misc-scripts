@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" style="color-scheme: dark;">
+<head>
+  <!-- <script src="sodium.js" async></script> -->
+  <script type="application/javascript" src="{{ url_for('static', filename='sodium.js') }}" async></script>
+  <script>
+    window.sodium = {
+      onload: function (sodium) {
+        let urlHash = location.hash;
+        if (urlHash.startsWith("#http")) {
+          let targetUrl = new URL(`http${urlHash.split("#http")[1]}`);
+
+          let key = sodium.from_hex("{{ key_hex }}");
+          console.log(key);
+
+          let nonce = sodium.randombytes_buf(sodium.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
+          console.log(nonce);
+
+          let encrypted = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(targetUrl.href, null, nonce, nonce, key);
+          // let newUrl = `${location.protocol}//${location.host}${location.pathname}?token=${sodium.to_base64(nonce)}$${sodium.to_base64(encrypted)}`;
+          let newUrl = `${location.protocol}//${location.host}${location.pathname}?token=${sodium.to_hex(nonce)}$${sodium.to_hex(encrypted)}`;
+          
+          // console.log(sodium.to_base64(encrypted));
+          console.log(newUrl);
+          window.location.replace(newUrl);
+        }
+      }
+    };
+  </script>
+</head>
+  <body>
+    <h1>Welcome to Twitter</h1>
+  </body>
+</html>

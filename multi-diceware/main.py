@@ -42,67 +42,70 @@ def short_dict(file):
     return worddict, dice_length, src_names
 
 def main():
-    print('Password length')
-    if (password_length := int(input('>>> '))) < 1:
-        exit()
-
-    print(
-        """
-Choose your lists
-0. Normal lists
-1. EFF short 1
-2. EFF short 2"""
-    )
-    list_choice = int(input('>>> '))
-
-    num_max = 100
-
-    match list_choice:
-        case 0:
-            worddict, dice_length, src_names = normal_dict()
-        case 1 | 2:
-            worddict, dice_length, src_names = short_dict(Path('sources') / f'eff_short_wordlist_{list_choice}.txt')
-        case _: 
+    while True:
+        if (password_length := int(input('\nPassword length (default 5)\n>>> ').strip() or '5')) < 1:
             exit()
 
-    dices = [
-        ''.join(str(randbelow(6) + 1) for _ in range(dice_length)) 
-        for _ in range(password_length)
-    ]
-    num_value = randbelow(num_max)
-    num_position = randbelow(password_length) + 1
-    title_position = randbelow(password_length) + 1
-    special_position = randbelow(password_length) + 1
+        print(
+"""
+Choose your lists
+0. Normal lists (default)
+1. EFF short 1
+2. EFF short 2
+"""
+        )
+        list_choice = int(input('>>> ').strip() or '0')
 
-    if src_names:
-        print()
-        for src_name in src_names:
-            print(src_name, end='\t')
+        num_max = 100
 
-    print('\n')
+        match list_choice:
+            case 0:
+                worddict, dice_length, src_names = normal_dict()
+            case 1 | 2:
+                worddict, dice_length, src_names = short_dict(Path('sources') / f'eff_short_wordlist_{list_choice}.txt')
+            case _: 
+                exit()
 
-    combined: list[list[str]] = [[] for _ in range(max(1, len(src_names)))]
-    for dice in dices:
-        dice_dict: dict = worddict[dice]
+        dices = [
+            ''.join(str(randbelow(6) + 1) for _ in range(dice_length)) 
+            for _ in range(password_length)
+        ]
+        num_value = randbelow(num_max)
+        num_position, title_position, special_position = (randbelow(password_length) + 1 for _ in range(3))
 
-        for i, word in enumerate(dice_dict.values()):
-            combined[i].append(word)
-            end_line = ''
-            if len(dice_dict) > 1:
-                end_line = ' '*(16 - len(word))
+        if src_names:
+            print()
+            for src_name in src_names:
+                print(src_name, end='\t')
 
-            print(word, end=end_line)
-        print()
+        print('\n')
 
-    print(f'\n{num_position = }')
-    print(f'{num_value = }')
-    print(f'{title_position = }')
-    print(f'{special_position = }\n')
+        combined: list[list[str]] = [[] for _ in range(max(1, len(src_names)))]
+        for dice in dices:
+            dice_dict: dict = worddict[dice]
 
-    for word_list in combined:
-        word_list[title_position - 1] = word_list[title_position - 1].title()
-        word_list[num_position - 1] += str(num_value)
-        print('.'.join(word_list), end='\n\n')
+            for i, word in enumerate(dice_dict.values()):
+                combined[i].append(word)
+                end_line = ''
+                if len(dice_dict) > 1:
+                    end_line = ' '*(16 - len(word))
+
+                print(word, end=end_line)
+            print()
+
+        print(f'\n{num_position = }')
+        print(f'{num_value = }')
+        print(f'{title_position = }')
+        print(f'{special_position = }\n')
+
+        for word_list in combined:
+            word_list[title_position - 1] = word_list[title_position - 1].title()
+            word_list[num_position - 1] += str(num_value)
+            print('.'.join(word_list), end='\n\n')
+        
+        if (input('Continue?\n>>> ').lower() in ['n', 'no']):
+            exit()
+        
 
 if __name__ == "__main__":
     main()

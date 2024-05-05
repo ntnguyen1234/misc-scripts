@@ -4,14 +4,8 @@ from urllib.parse import quote
 
 from flask import redirect, render_template, request
 
+from utils import request_url
 
-def request_url(url: str):
-    req = urllib.request.Request(url, method='GET')
-
-    with urllib.request.urlopen(req) as response:
-        data = response.read()
-
-    return json.loads(data)
 
 def get_url(claim_data: dict, ids: str):
     if not (claim_ids := claim_data.get(ids, None)):
