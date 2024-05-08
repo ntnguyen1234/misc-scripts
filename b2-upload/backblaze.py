@@ -79,8 +79,7 @@ class B2:
                 file_name = self.upload_image(b2_file_name)
             
             case upload_type if upload_type in self.b2_keys['txtTypes']:
-                print('Local file?')
-                local_file = input('>>> ')
+                local_file = input('Local file? (Blank to get from clipboard)\n>>> ')
                 
                 print('Uploading...')
                 file_name = self.upload_text(b2_file_name, upload_type, local_file)
