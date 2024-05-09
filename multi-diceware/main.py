@@ -105,6 +105,11 @@ Choose your lists
                 word_lists.append([letter[:3] for letter in word_list])
 
             for wlist in word_lists:
+                minified = [word.title() for word in wlist]
+                minified[num_position - 1] += str(num_value)
+                minified[special_position - 1] += '.'
+                print(''.join(minified), end='\n\n')
+
                 wlist[title_position - 1] = wlist[title_position - 1].title()
                 wlist[num_position - 1] += str(num_value)
                 print('.'.join(wlist), end='\n\n')
