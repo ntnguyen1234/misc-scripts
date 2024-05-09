@@ -99,9 +99,15 @@ Choose your lists
         print(f'{special_position = }\n')
 
         for word_list in combined:
-            word_list[title_position - 1] = word_list[title_position - 1].title()
-            word_list[num_position - 1] += str(num_value)
-            print('.'.join(word_list), end='\n\n')
+            word_lists = [word_list]
+
+            if list_choice == 2:
+                word_lists.append([letter[:3] for letter in word_list])
+
+            for wlist in word_lists:
+                wlist[title_position - 1] = wlist[title_position - 1].title()
+                wlist[num_position - 1] += str(num_value)
+                print('.'.join(wlist), end='\n\n')
         
         if (input('Continue?\n>>> ').lower() in ['n', 'no']):
             exit()
