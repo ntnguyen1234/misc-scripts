@@ -45,7 +45,7 @@ class B2:
                 data_bytes=img_bytes,
                 file_name=(file_name := f'img/{b2_file_name}.{img_format.lower()}')
             )
-            print(response)
+            print(response, end='\n\n')
 
         return file_name
     
@@ -75,13 +75,13 @@ class B2:
 
         match upload_type:
             case 'img':
-                print('Uploading...')
+                print('Uploading...\n')
                 file_name = self.upload_image(b2_file_name)
             
             case upload_type if upload_type in self.b2_keys['txtTypes']:
                 local_file = input('Local file? (Blank to get from clipboard)\n>>> ')
                 
-                print('Uploading...')
+                print('Uploading...\n')
                 file_name = self.upload_text(b2_file_name, upload_type, local_file)
                 
             case _:

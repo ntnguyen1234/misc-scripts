@@ -43,7 +43,7 @@ def short_dict(file):
 
 def main():
     while True:
-        if (password_length := int(input('\nPassword length (default 5)\n>>> ').strip() or '5')) < 1:
+        if (password_length := int(input('\nPassword length (default 6)\n>>> ').strip() or '6')) < 1:
             exit()
 
         print(

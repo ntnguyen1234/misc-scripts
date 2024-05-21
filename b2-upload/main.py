@@ -4,8 +4,7 @@ from backblaze import B2
 
 
 def main():
-    print('Upload type?')
-    if not (upload_type := input('>>> ')):
+    if not (upload_type := input('Upload type?\n>>> ')):
         return
 
     with open('b2.json', 'r', encoding='utf-8') as fr:
@@ -17,6 +16,8 @@ def main():
     b2_app.authorize()
     
     b2_app.upload_from_clipboard(upload_type)
+
+    input('\n')
 
 
 if __name__ == "__main__":
