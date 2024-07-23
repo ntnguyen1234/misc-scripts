@@ -133,6 +133,7 @@ multiprocessing_test
 
 /b2-upload/b2.json
 /b2-upload/b2_2.json
+/b2-upload/backblaze2.py
 
 /flask-app/search.py
 

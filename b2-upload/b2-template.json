@@ -4,6 +4,7 @@
     "applicationKey": "",
     "bucketName": "",
     "subDomain": "",
+    "uploadTypes": ["img", "media"],
     "imgTypes": [
         "gif",
         "jpeg",
@@ -14,6 +15,8 @@
         "js",
         "json",
         "md",
-        "txt"
+        "pdf",
+        "txt",
+        "xml"
     ]
 }

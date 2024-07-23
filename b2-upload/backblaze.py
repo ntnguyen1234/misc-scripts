@@ -1,5 +1,5 @@
 import io
-import random
+import secrets
 import string
 from pathlib import Path
 
@@ -8,10 +8,15 @@ from PIL import ImageGrab
 from pyclip import copy, paste
 
 
+def random_name() -> str:
+    init_name = input('\nInit name\n>>> ')
+    alphabet = string.ascii_letters + string.digits
+    return init_name + '-' + ''.join(secrets.choice(alphabet) for i in range(8))
+
 class B2:
     def __init__(self, b2_keys: dict[str, str]):
         self.info = b2.InMemoryAccountInfo()
-        self.b2_api = b2.B2Api(self.info)
+        self.b2_api = b2.B2Api(self.info, cache=b2.AuthInfoCache(self.info))
 
         self.b2_keys = b2_keys
     
@@ -19,24 +24,14 @@ class B2:
         self.b2_api.authorize_account('production', self.b2_keys['keyID'], self.b2_keys['applicationKey'])
         self.bucket = self.b2_api.get_bucket_by_name(self.b2_keys['bucketName'])
 
-    def upload_image(self, b2_file_name: str) -> str | None:
-        img = ImageGrab.grabclipboard()
-                
-        if isinstance(img, list):
-            if not isinstance(img[0], str):
-                return
-            
-            if (suffix := Path(img[0]).suffix).strip('.') not in self.b2_keys['imgTypes']:
-                return
-
-            self.bucket.upload_local_file(
-                local_file=img[0],
-                file_name=(file_name := f'img/{b2_file_name+suffix}'),
-            )
+    def upload_image(self, b2_file_name: str) -> str:
+        if isinstance((img := ImageGrab.grabclipboard()), list):
+            file_name = ""
         else:
             if (img_format := img.format).lower() not in self.b2_keys['imgTypes']:
-                return
-
+                print('\nNot images\n')
+                exit()
+            
             img_bytes = io.BytesIO()
             img.save(img_bytes, format=img_format)
             img_bytes = img_bytes.getvalue()
@@ -45,50 +40,57 @@ class B2:
                 data_bytes=img_bytes,
                 file_name=(file_name := f'img/{b2_file_name}.{img_format.lower()}')
             )
+            print('')
             print(response, end='\n\n')
 
         return file_name
     
-    def upload_text(self, b2_file_name: str, upload_type: str, local_file: str=None) -> str:
-        file_name = f'{upload_type}/{b2_file_name}.{upload_type.lower()}'
-        
-        if local_file:
-            self.bucket.upload_local_file(
-                local_file=local_file,
-                file_name=file_name
-            )
+    def upload_file(self, b2_file_name: str, upload_type: str, local_file: Path) -> str:
+        if upload_type == 'media':
+            suffix = local_file.suffix.lower().strip('.')
         else:
-            self.bucket.upload_bytes(
-                data_bytes=paste(),
-                file_name=file_name
-            )
+            suffix = upload_type.lower()
+
+        file_name = f'{upload_type}/{b2_file_name}.{suffix}'
+        
+        self.bucket.upload_local_file(
+            local_file=local_file,
+            file_name=file_name
+        )
             
         return file_name
     
-    def upload_from_clipboard(self, upload_type: str):
-        characters = string.ascii_letters + string.digits
-        b2_file_name = ''.join([random.choice(characters) for _ in range(8)])
+    def upload_from_clipboard(self, upload_type: str, b2_file_name: str):
+        if upload_type == 'img':
+            self.upload_image(b2_file_name)
 
-        print('File name:')
-        if (f_name := input('>>> ')):
-            b2_file_name = f'{f_name}-{b2_file_name}'
+    def upload_general(self, orig_file: str, upload_type: str):
+        uploaded_name = ''
 
-        match upload_type:
-            case 'img':
-                print('Uploading...\n')
-                file_name = self.upload_image(b2_file_name)
-            
-            case upload_type if upload_type in self.b2_keys['txtTypes']:
-                local_file = input('Local file? (Blank to get from clipboard)\n>>> ')
-                
-                print('Uploading...\n')
-                file_name = self.upload_text(b2_file_name, upload_type, local_file)
-                
-            case _:
-                file_name = None
+        if orig_file == "1": # Clipboard
+            b2_file_name = random_name()
+            if upload_type != 'img':
+                print('\nClipboard only supports images\n')
+                exit()
+            uploaded_name = self.upload_image(b2_file_name)
+        else:  # Local file
+            local_file = Path(input('\nCopy local file path to here\n>>> ').strip('"')).absolute()
+            if not local_file.is_file():
+                print(f'\nNo file at {str(local_file)}\n')
+                exit()
 
-        if not file_name:
-            return
+            rename_file = input('\nDo you want to rename file? (y/n)\n>>> ').lower()
+            if rename_file in ('y', 'yes'):
+                b2_file_name = random_name()
+            elif rename_file in ('n', 'no'):
+                b2_file_name = local_file.stem
+            else:
+                exit()
+
+            uploaded_name = self.upload_file(b2_file_name, upload_type, local_file)
+
+        if not uploaded_name:
+            exit()
         
-        copy(export_url := f'https://{self.b2_keys["subDomain"]}/{file_name}')
-        print(export_url)
+        copy(export_url := f'https://{self.b2_keys["subDomain"]}/{uploaded_name}')
+        print('\n' + export_url)
