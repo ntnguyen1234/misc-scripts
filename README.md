@@ -2,4 +2,4 @@
 Small scripts and functions in Python
 
 ### ttm
-Upload image from clipboard to `https://ttm.sh`
+Upload images from clipboard to `https://ttm.sh`
